@@ -4,14 +4,26 @@ pipeline{
     tools {
         maven 'maven'
     }
-    /*environment{
-       ArtifactId = readMavenPom().getArtifactId()
-       Version = readMavenPom().getVersion()
-       Name = readMavenPom().getName()
-       GroupId = readMavenPom().getGroupId()
-    }*/
+    environment{
+       ArtifactId = ""
+       Version = 0
+       Name = ""
+       GroupId = ""
+    }
     stages {
         // Specify various stage with in stages
+        // stage 0 : Initialization
+        stage ('Init'){
+            steps {
+                script {
+                    ArtifactId = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+                    Version = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+                    Name = sh script: 'mvn help:evaluate -Dexpression=project.name -q -DforceStdout', returnStdout: true
+                    GroupId = sh script: 'mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+       
+                }
+            }
+        }
 
         // stage 1. Build
         stage ('Build'){
@@ -56,10 +68,10 @@ pipeline{
         stage ('Print Environment variables'){
                     steps {
                         echo "Print Environment variables"
-                        /*echo "Artifact ID is '${ArtifactId}'"
+                        echo "Artifact ID is '${ArtifactId}'"
                         echo "Version is '${Version}'"
                         echo "GroupID is '${GroupId}'"
-                        echo "Name is '${Name}'"*/
+                        echo "Name is '${Name}'"
                     }
                 }
 
